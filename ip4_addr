@@ -1,0 +1,6 @@
+#!/bin/bash
+if [[ $# -ne 1 ]]; then
+  ip4_cidr | cut -d'/' -f1
+else
+  ip4_cidr $1 | cut -d'/' -f1
+fi

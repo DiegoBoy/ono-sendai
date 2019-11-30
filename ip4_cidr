@@ -1,0 +1,6 @@
+#!/bin/bash
+if [[ $# -ne 1 ]]; then
+  ip -o -f inet addr show | awk '/scope global/ {print $2, $4}'
+else
+  ip -o -f inet addr show $1 | awk '/scope global/ {print $4}'
+fi
