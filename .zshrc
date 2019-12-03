@@ -1,8 +1,8 @@
 # Path to ono-senpai util cmds
-export PATH=/root/ono-senpai/util:$PATH
+export PATH=~/ono-sendai/util:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/root/.oh-my-zsh"
+export ZSH="~/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
