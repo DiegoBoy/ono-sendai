@@ -24,7 +24,9 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/p
 
 # install grc general colourizer and clean up
 git clone https://github.com/garabik/grc.git
-grc/install.sh
+cd grc
+sudo ./install.sh
+cd ..
 rm -Rf grc
 
 # update zsh config file
@@ -43,12 +45,13 @@ echo "[X] Shell"
 sudo apt-get install terminator -y
 
 # update terminator config file
+mkdir -p ~/.config/terminator/
 cp terminator.config ~/.config/terminator/config
 
 # fix termiantor custom commands menu plugin
-sed -i 's/terminal.vte.feed_child(command, len(command))/terminal.vte.feed_child(command.encode("utf-8"))/g' /usr/share/terminator/terminatorlib/plugins/custom_commands.py
-py3clean /usr/share/terminator/terminatorlib/plugins
-python -m compileall /usr/share/terminator/terminatorlib/plugins
+sudo sed -i 's/terminal.vte.feed_child(command, len(command))/terminal.vte.feed_child(command.encode("utf-8"))/g' /usr/share/terminator/terminatorlib/plugins/custom_commands.py
+sudo py3clean /usr/share/terminator/terminatorlib/plugins
+sudo python -m compileall /usr/share/terminator/terminatorlib/plugins
 
 echo "[X] Terminal"
 
