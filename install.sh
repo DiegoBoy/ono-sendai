@@ -33,6 +33,7 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/p
 cp .zshrc ~/.zshrc
 
 # switch default shell to zsh
+echo "[!] To continue with installation, exit zsh once oh-my-zsh loads"
 chsh -s $(which zsh)
 
 
