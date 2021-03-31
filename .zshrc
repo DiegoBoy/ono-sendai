@@ -18,22 +18,6 @@ COMPLETION_WAITING_DOTS="true"
 # hide EOL sign ('%')
 export PROMPT_EOL_MARK=""
 
-new_line_before_prompt=yes
-precmd() {
-    # Print the previously configured title
-    print -Pnr -- "$TERM_TITLE"
-
-    # Print a new line before the prompt, but only if it is not the first line
-    if [ "$new_line_before_prompt" = yes ]; then
-	    if [ -z "$_NEW_LINE_BEFORE_PROMPT" ]; then
-	        _NEW_LINE_BEFORE_PROMPT=1
-	    else
-	        print ""
-	    fi
-    fi
-}
-
-
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
