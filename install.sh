@@ -50,6 +50,7 @@ sudo apt-get install -y bat > /dev/null
 
 # install grc (general colourizer)
 sudo apt-get install -y grc > /dev/null
+sudo curl -s -fsSL https://raw.githubusercontent.com/garabik/grc/master/grc.zsh > /etc/grc.zsh
 
 # install vs code
 sudo apt-get install -y apt-transport-https > /dev/null

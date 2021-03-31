@@ -59,7 +59,6 @@ source /usr/share/doc/fzf/examples/completion.zsh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias bat='cat'
 alias l='ls -al'
 alias x='grc extract'
 
