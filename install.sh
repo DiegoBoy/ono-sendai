@@ -103,7 +103,16 @@ xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids $(echo $all_ids) --cre
 xfce4-panel --restart
 
 ## Wallpaper
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/last-image -s wallpaper.jpg
+# copy readable image
+sudo mkdir -p /usr/share/backgrounds/ono-sendai
+sudo cp wallpaper.jpg /usr/share/backgrounds/ono-sendai/
+sudo chmod 0666 /usr/share/backgrounds/ono-sendai/wallpaper.jpg
+
+# set wallpaper
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
 
 
 
