@@ -63,9 +63,10 @@ sudo apt-get install -y code > /dev/null
 
 
 
-### UX - Panel
-echo "[*] Customizing top panel..."
+### UX
+echo "[*] Customizing UX..."
 
+## Panel
 # cache newest plugin ID
 last_id=$(xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids| grep -v "Value is an\|^$" | sort -n | tail -1)
 
@@ -100,6 +101,9 @@ for i in $(seq 1 $last_id); do all_ids="$all_ids -t int -s $i"; done
 xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -rR
 xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids $(echo $all_ids) --create
 xfce4-panel --restart
+
+## Wallpaper
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/last-image -s wallpaper.jpg
 
 
 
