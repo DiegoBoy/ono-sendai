@@ -61,6 +61,14 @@ rm packages.microsoft.gpg
 sudo apt-get update > /dev/null
 sudo apt-get install -y code > /dev/null
 
+# reconfig wireshark to run as non-root
+sudo apt-get install debconf-utils -y
+sudo debconf-set-selections <<< 'wireshark-common wireshark-common/install-setuid boolean true'
+sudo dpkg-reconfigure wireshark-common -fnoninteractive
+sudo usermod -aG wireshark $USER
+mkdir -p ~/.local/share/applications
+sed 's/pkexec //g' /usr/share/applications/wireshark.desktop > ~/.local/share/applications/wireshark.desktop
+
 
 
 ### UX
