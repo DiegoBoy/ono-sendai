@@ -117,10 +117,10 @@ sudo cp wallpaper.jpg /usr/share/backgrounds/ono-sendai/
 sudo chmod 0666 /usr/share/backgrounds/ono-sendai/wallpaper.jpg
 
 # set wallpaper
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
 
 
 
