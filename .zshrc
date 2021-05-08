@@ -44,7 +44,7 @@ source /usr/share/doc/fzf/examples/completion.zsh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias bat='batcat --paging=always'
-alias cat='bat --paging=never'
+alias cat='batcat --paging=never -p'
 alias l='ls -al'
 alias x='grc extract'
 
