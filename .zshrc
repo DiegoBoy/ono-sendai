@@ -46,7 +46,30 @@ source /usr/share/doc/fzf/examples/completion.zsh
 alias bat='batcat --paging=always'
 alias cat='batcat --paging=never -p'
 alias l='ls -al'
-alias x='grc extract'
+alias x='extract'
+
+# we can use zsh plugins as sudo this way
+sudo() {
+    full_cmd="$@"
+    /usr/bin/sudo zsh -ic "$full_cmd"
+}
+
+# custom settings for autorecon
+autorecon() {
+  # set perms on results folder (otherwise it'll be root-only)
+  md results
+  chmod 2770 results
+  setfacl -d -m u::rwX,g::rwX,o::0 results
+
+  # run autorecon
+  sudo PATH="$PATH" HOME="$HOME" autorecon -v --single-target $@
+
+  # color results using grc
+  for f in results/**/*nmap.txt
+  do 
+    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi 1>/dev/null
+  done
+}
 
 # include GRC aliases
 [[ -s "/etc/grc.zsh" ]] && source /etc/grc.zsh

@@ -1,6 +1,24 @@
 #!/bin/bash
 # ono-sendai installer
 
+config_omz() {
+    # install oh-my-zsh
+    echo 'exit' | sh -c "$(curl -s -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > /dev/null
+    
+    # install theme PowerLevel9K
+    git clone -q https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
+
+    # install plugins
+    git clone -q https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+    git clone -q https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+
+    # update zsh config file
+    cp .zshrc ~/.zshrc
+
+    # switch default shell to zsh
+    chsh -s $(which zsh)
+}
+
 # update repos first
 sudo apt-get update > /dev/null
 
@@ -16,29 +34,17 @@ cp terminator.config ~/.config/terminator/config
 echo "TerminalEmulator=terminator" > ~/.config/xfce4/helpers.rc
 
 
+
 ### Shell
 echo "[*] Installing shell..."
 
 # install zsh, fonts and icons
 sudo apt-get install -y zsh fonts-hack-ttf fonts-powerline > /dev/null
 
-# install oh-my-zsh
-echo 'exit' | sh -c "$(curl -s -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > /dev/null
-
-# install theme PowerLevel9K
-git clone -q https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
-
-# install plugins
+# config oh-my-zsh and plugins (also for root)
+config_omz
+sudo su -c "$(declare -f config_omz); config_omz" 
 sudo apt-get install -y fzf > /dev/null
-git clone -q https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-git clone -q https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-
-# update zsh config file
-cp .zshrc ~/.zshrc
-sudo cp .zshrc /root/.zshrc
-
-# switch default shell to zsh
-chsh -s $(which zsh)
 
 
 
