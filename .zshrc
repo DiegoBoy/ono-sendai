@@ -67,7 +67,7 @@ autorecon() {
   # color results using grc
   for f in results/**/*nmap.txt
   do 
-    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi 1>/dev/null
+    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &>/dev/null
   done
 }
 
