@@ -62,7 +62,7 @@ autorecon() {
   setfacl -d -m u::rwX,g::rwX,o::0 results
 
   # run autorecon
-  sudo PATH="$PATH" HOME="$HOME" autorecon -v --single-target $@
+  sudo PATH="$PATH" HOME="$HOME" autorecon -vv --single-target $@
 
   # color results using grc
   for f in results/**/*nmap.txt
