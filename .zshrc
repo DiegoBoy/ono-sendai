@@ -47,30 +47,35 @@ alias bat='batcat --paging=always'
 alias cat='batcat --paging=never -p'
 alias l='ls -al'
 alias x='extract'
+alias _='/usr/bin/sudo'
 
 # we can use zsh plugins as sudo this way
 sudo() {
     full_cmd="$@"
-    /usr/bin/sudo zsh -ic "$full_cmd"
+    _ zsh -ic "$full_cmd"
 }
 
 # custom settings for autorecon
 autorecon() {
-  # set perms on results folder (otherwise it'll be root-only)
-  md results
-  chmod 2770 results
-  setfacl -d -m u::rwX,g::rwX,o::0 results
-
   # run autorecon
-  sudo PATH="$PATH" HOME="$HOME" autorecon -vv --single-target $@
+  sudo env PATH="$PATH" HOME="$HOME" autorecon -vv --single-target $@
 
-  # color results using grc
-  for f in results/**/*nmap.txt
-  do 
-    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &>/dev/null
-  done
+  # check if there are results
+  if test -f ./results; 
+  then
+    # change ownership of result files
+    sudo chmod -r $(whoami):$(whoami) ./results
+
+    # color results using grc
+    for f in results/**/*nmap.txt
+    do 
+      grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &>/dev/null
+    done
+  fi
 }
 
 # include GRC aliases
 [[ -s "/etc/grc.zsh" ]] && source /etc/grc.zsh
+
+export PATH="$PATH:$HOME/.local/bin"
 
