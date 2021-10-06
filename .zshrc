@@ -55,7 +55,6 @@ sudo() {
     _ zsh -ic "$full_cmd"
 }
 
-<<<<<<< HEAD
 # custom settings for autorecon + autoreport
 autoreconnoisseur() {
   # set perms on results folder (otherwise it'll be root-only)
@@ -72,14 +71,9 @@ autoreconnoisseur() {
   autoreport --watchMode -k $1 -u $2 &
   autoreportPID=$!
 
-=======
-# custom settings for autorecon
-autorecon() {
->>>>>>> d988d825f198bfbabace29b375402582f989622a
   # run autorecon
   sudo env PATH="$PATH" HOME="$HOME" autorecon -vv --single-target "${@:3}"
 
-<<<<<<< HEAD
   # color results using grc
   for f in results/**/*nmap.txt
   do 
@@ -87,20 +81,6 @@ autorecon() {
   done 2> /dev/null
 
   kill $autoreportPID > /dev/null
-=======
-  # check if there are results
-  if test -f ./results; 
-  then
-    # change ownership of result files
-    sudo chmod -r $(whoami):$(whoami) ./results
-
-    # color results using grc
-    for f in results/**/*nmap.txt
-    do 
-      grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &>/dev/null
-    done
-  fi
->>>>>>> d988d825f198bfbabace29b375402582f989622a
 }
 
 # include GRC aliases
