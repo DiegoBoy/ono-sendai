@@ -54,25 +54,35 @@ sudo() {
     /usr/bin/sudo zsh -ic "$full_cmd"
 }
 
-# custom settings for autorecon
-autorecon() {
+# custom settings for autorecon + autoreport
+autoreconnoisseur() {
   # set perms on results folder (otherwise it'll be root-only)
   md results
   chmod 2770 results
   setfacl -d -m u::rwX,g::rwX,o::0 results
+  md results/scans
+
+  if ! autoreport --testMode -k $1 -u $2
+  then
+    return $?
+  fi
+
+  autoreport --watchMode -k $1 -u $2 &
+  autoreportPID=$!
 
   # run autorecon
-  sudo env PATH="$PATH" HOME="$HOME" autorecon -vv --single-target $@
+  sudo env PATH="$PATH" HOME="$HOME" autorecon -vv --single-target "${@:3}"
 
   # color results using grc
   for f in results/**/*nmap.txt
   do 
-    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &>/dev/null
-  done
+    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &> /dev/null
+  done 2> /dev/null
+
+  kill $autoreportPID > /dev/null
 }
 
 # include GRC aliases
 [[ -s "/etc/grc.zsh" ]] && source /etc/grc.zsh
 
 export PATH="$PATH:$HOME/.local/bin"
-
