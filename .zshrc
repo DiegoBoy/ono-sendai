@@ -63,11 +63,13 @@ autoreconnoisseur() {
   setfacl -d -m u::rwX,g::rwX,o::0 results
   md results/scans
 
+  # validate args first
   if ! autoreport --testMode -k $1 -u $2
   then
     return $?
   fi
 
+  # run autoreport in background
   autoreport --watchMode -k $1 -u $2 &
   autoreportPID=$!
 
@@ -80,6 +82,7 @@ autoreconnoisseur() {
     grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &> /dev/null
   done 2> /dev/null
 
+  # send signal to stop autoreport
   kill $autoreportPID > /dev/null
 }
 
