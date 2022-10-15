@@ -64,7 +64,7 @@ autoreconnoisseur() {
   md results/scans
 
   # validate args first
-  if ! autoreport --testMode -k $1 -u $2
+  if ! autoreport --testMode -k $1 -i $2
   then
     return $?
   fi
