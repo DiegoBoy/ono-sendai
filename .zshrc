@@ -70,7 +70,7 @@ autoreconnoisseur() {
   fi
 
   # run autoreport in background
-  autoreport --watchMode -k $1 -u $2 &
+  autoreport --watchMode -k $1 -i $2 &
   autoreportPID=$!
 
   # run autorecon
