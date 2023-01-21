@@ -45,6 +45,7 @@ source /usr/share/doc/fzf/examples/completion.zsh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias bat='batcat --paging=always'
 alias cat='batcat --paging=never -p'
+alias cme='crackmapexec'
 alias l='ls -al'
 alias x='extract'
 alias _='/usr/bin/sudo'
