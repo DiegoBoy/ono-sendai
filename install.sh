@@ -75,11 +75,14 @@ sudo usermod -aG wireshark $USER
 mkdir -p ~/.local/share/applications
 sed 's/pkexec //g' /usr/share/applications/wireshark.desktop > ~/.local/share/applications/wireshark.desktop
 
+## RDP
 # install and enable rdp
 sudo apt-get install xrdp -y
 sudo systemctl enable xrdp
 sudo systemctl start xrdp
 
+# fix black screen after login when reconnecting
+sudo cp startwm.sh /etc/xrdp/startwm.sh
 
 
 ### UX
