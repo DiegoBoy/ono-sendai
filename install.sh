@@ -1,24 +1,32 @@
 #!/bin/bash
 # ono-sendai installer
 
+### functions
+# wrapper for oh-my-zsh to install it both as current $USER and root (required to run aliases and functions as root)
 config_omz() {
     # install oh-my-zsh
     echo 'exit' | sh -c "$(curl -s -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" > /dev/null
     
-    # install theme PowerLevel9K
-    git clone -q https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k
-
     # install plugins
-    git clone -q https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+    git clone -q https://github.com/DiegoBoy/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
     git clone -q https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+    
+    # install theme powerlevel10k
+    git clone -q https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
 
+    # install dracula color theme for powerlevel10k
+    wget -q https://github.com/dracula/powerlevel10k/raw/main/files/.p10k.zsh -O ~/.p10k.zsh
+    
     # update zsh config file
-    cp .zshrc ~/.zshrc
+    wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/.zshrc -O ~/.zshrc
 
     # switch default shell to zsh
     chsh -s $(which zsh)
 }
 
+
+
+### Init
 # update repos first
 sudo apt-get update > /dev/null
 
@@ -30,7 +38,7 @@ echo "[*] Installing terminal..."
 # install terminator
 sudo apt-get install -y terminator > /dev/null
 mkdir -p ~/.config/terminator/
-cp terminator.config ~/.config/terminator/config
+wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/terminator.config -O ~/.config/terminator/config
 echo "TerminalEmulator=terminator" > ~/.config/xfce4/helpers.rc
 
 
@@ -39,7 +47,14 @@ echo "TerminalEmulator=terminator" > ~/.config/xfce4/helpers.rc
 echo "[*] Installing shell..."
 
 # install zsh, fonts and icons
-sudo apt-get install -y zsh fonts-hack-ttf fonts-powerline > /dev/null
+sudo apt-get install -y zsh fonts-powerline > /dev/null
+
+# install font optimized for powerlevel10k
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Regular.ttf
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Italic.ttf
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Bold.ttf
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Bold_Italic.ttf
+sudo fc-cache -f
 
 # config oh-my-zsh and plugins (also for root)
 config_omz
@@ -82,59 +97,26 @@ sudo systemctl enable xrdp
 sudo systemctl start xrdp
 
 # fix black screen after login when reconnecting
-sudo cp startwm.sh /etc/xrdp/startwm.sh
+sudo wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/startwm.sh -O /etc/xrdp/startwm.sh
+
 
 
 ### UX
 echo "[*] Customizing UX..."
 
 ## Panel
-# cache newest plugin ID
-last_id=$(xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids| grep -v "Value is an\|^$" | sort -n | tail -1)
-
-# remove existing launchers
-rm -r ~/.config/xfce4/panel/launcher-*
-xfconf-query -c xfce4-panel -p /plugins/plugin-4 -rR
-xfconf-query -c xfce4-panel -p /plugins/plugin-5 -rR
-xfconf-query -c xfce4-panel -p /plugins/plugin-6 -rR
-xfconf-query -c xfce4-panel -p /plugins/plugin-7 -rR
-xfce4-panel --restart
-
-# create directory menu
-xfconf-query -c xfce4-panel -p /plugins/plugin-4 -t string -s "directorymenu" --create
-xfconf-query -c xfce4-panel -p /plugins/plugin-4/icon-name -t string -s "system-file-manager" -a --create
-xfconf-query -c xfce4-panel -p /plugins/plugin-4/base-directory -t string -s "$HOME" -a --create
-sleep 1
-
-# create launcher (terminal)
-xfce4-panel --add=launcher /usr/share/applications/terminator.desktop
-sleep 1
-
-# create launcher (firefox)
-xfce4-panel --add=launcher /usr/share/applications/firefox-esr.desktop
-sleep 1
-
-# create launcher (burp)
-xfce4-panel --add=launcher /usr/share/applications/kali-burpsuite.desktop
-sleep 1
-
-# apply panel changes
-for i in $(seq 1 $last_id); do all_ids="$all_ids -t int -s $i"; done
-xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids -rR
-xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids $(echo $all_ids) --create
-xfce4-panel --restart
+# load profile
+xfce4-panel-profiles load /opt/ono-sendai/xfce4-panel.xml
 
 ## Wallpaper
 # copy readable image
 sudo mkdir -p /usr/share/backgrounds/ono-sendai
-sudo cp wallpaper.jpg /usr/share/backgrounds/ono-sendai/
+sudo wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/wallpaper.jpg -O /usr/share/backgrounds/ono-sendai/wallpaper.jpg
 sudo chmod 0666 /usr/share/backgrounds/ono-sendai/wallpaper.jpg
 
 # set wallpaper
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorVirtual1/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace0/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
-xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitorRdp0/workspace1/last-image -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null
+deskpaths=$(xfconf-query -c xfce4-desktop -l | grep -i 'last-image$')
+for d in $(echo $deskpaths); do xfconf-query -c xfce4-desktop -p $d -s /usr/share/backgrounds/ono-sendai/wallpaper.jpg > /dev/null; done
 
 
 
