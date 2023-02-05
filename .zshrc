@@ -177,6 +177,10 @@ alias gru='git remote add upstream'
 alias grv='git remote --verbose'
 alias gs='git status'
 
+# openvpn
+alias svpnd='sudo openvpn --daemon --config'
+alias skvpn='sudo killall -9 openvpn'
+
 # extract and compress archives
 alias tar-bz2='tar -cvjf'
 alias tar-gz='tar -cvzf'

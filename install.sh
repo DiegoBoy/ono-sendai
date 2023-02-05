@@ -50,10 +50,11 @@ echo "[*] Installing shell..."
 sudo apt-get install -y zsh fonts-powerline > /dev/null
 
 # install font optimized for powerlevel10k
-sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Regular.ttf
-sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Italic.ttf
-sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Bold.ttf
-sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -P /usr/share/fonts/MesloNF/MesloLGS_NF_Bold_Italic.ttf
+sudo mkdir -p /usr/share/fonts/MesloNF/
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -O /usr/share/fonts/MesloNF/MesloLGS_NF_Regular.ttf
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -O /usr/share/fonts/MesloNF/MesloLGS_NF_Italic.ttf
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -O /usr/share/fonts/MesloNF/MesloLGS_NF_Bold.ttf
+sudo wget -q https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -O /usr/share/fonts/MesloNF/MesloLGS_NF_Bold_Italic.ttf
 sudo fc-cache -f
 
 # config oh-my-zsh and plugins (also for root)
