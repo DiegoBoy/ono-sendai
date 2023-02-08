@@ -162,6 +162,7 @@ alias cat='batcat --paging=never -p' # colored syntax, no paging
 alias ga='git add'
 alias gaa='git add --all'
 alias gcm='git commit --message'
+alias gcam='git commit --all --message'
 alias gcl='git clone --recurse-submodules'
 alias gco='git checkout'
 alias gcob='git checkout -b'
@@ -225,6 +226,13 @@ fi
 
 ### util ###
 
+# we can use zsh plugins as sudo this way
+sudo() {
+    full_cmd="$@"
+    _ zsh -ic "$full_cmd"
+}
+
+
 # ask for user confirmation
 # $1 = message to display (default="")
 # $2 = default answer [y|n] (default=n)
@@ -247,12 +255,6 @@ ask-confirm() {
     [nN] | [nN][oO] ) return 1;;
     * ) $by_default && return 0 || return 1;;
   esac
-}
-
-# we can use zsh plugins as sudo this way
-sudo() {
-    full_cmd="$@"
-    _ zsh -ic "$full_cmd"
 }
 
 
@@ -286,6 +288,22 @@ net-mask() {
 # $1 = network interface (default=eth0)
 net-range() {
   netmask -r $(net-cidr $1)
+}
+
+
+# pushes a commit that includes all changes
+# $1 = message for commit
+git-checkin-all() {
+  if (( ! $# )); then
+    echo "A commit message is required."
+    return 1
+  fi
+
+  # get status, commit all, push -u origin, and get status again
+  gs
+  gcam "$1"
+  gpso
+  gs
 }
 
 
