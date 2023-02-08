@@ -184,9 +184,17 @@ alias gru='git remote add upstream'
 alias grv='git remote --verbose'
 alias gs='git status'
 
+# ip
+alias ipcidr='net-cidr'
+alias ipmask='net-mask'
+alias iprange='net-range'
+
 # openvpn
-alias ovpnd='sudo openvpn --daemon --config'
-alias ovpnk='sudo killall -9 openvpn'
+alias vpnip='net-ip tun0'
+alias vpncidr='net-cidr tun0'
+alias vpnmask='net-mask tun0'
+alias vpnrange='net-range tun0'
+alias vpnkill='sudo killall -9 openvpn'
 
 # extract and compress archives
 alias tar-bz2='tar -cvjf'
@@ -280,16 +288,33 @@ net-ip() {
 # get the local IPv4 subnet mask
 # $1 = network interface (default=eth0)
 net-mask() {
-  netmask -s $(net-cidr $1)
+  netmask -s $(net-cidr $1) | cut -d '/' -f2 | awk '{$1=$1};1'
 }
 
 
 # get the local IPv4 subnet mask
 # $1 = network interface (default=eth0)
 net-range() {
-  netmask -r $(net-cidr $1)
+  netmask -r $(net-cidr $1) | awk '{$1=$1};1'
 }
 
+
+# convenient wrapper for net-ip
+# $1 = network interface (default=eth0)
+ip() {
+  if (( ! $# )); then
+    net-ip
+  else
+    /usr/sbin/ip "$@"
+  fi
+}
+
+
+# connect to vpn in daemon mode
+# $1 = openvpn config file
+vpnd() {
+  sudo openvpn --daemon --config "$1" && sleep 1
+}
 
 # pushes a commit that includes all changes
 # $1 = message for commit
@@ -300,10 +325,7 @@ git-checkin-all() {
   fi
 
   # get status, commit all, push -u origin, and get status again
-  gs
-  gcam "$1"
-  gpso
-  gs
+  gs && gcam "$1" && gpso && gs
 }
 
 
