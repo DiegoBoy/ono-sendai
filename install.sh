@@ -1,6 +1,30 @@
 #!/bin/bash
 # ono-sendai installer
 
+echo "
+##################
+#   ono-sendai   #
+##################
+"
+
+### Init
+echo "[*] Init install..."
+# update repos first
+sudo apt-get update > /dev/null
+
+# get base dir of this installer
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+
+### Dev mode
+# enable dev if installer is in repo dir
+if [[ $(git --git-dir "${SCRIPT_DIR}/.git" rev-parse --is-inside-work-tree 2>/dev/null) ]]; then
+    # add env var to ~/.zshenv because its loaded before ~/.zshrc
+    echo "export ONOSENDAI_DEV_PATH='${SCRIPT_DIR}'" >> ~/.zshenv
+    echo "[*] Dev mode enabled (git)"
+fi
+
+
 ### functions
 # wrapper for oh-my-zsh to install it both as current $USER and root (required to run aliases and functions as root)
 config_omz() {
@@ -23,12 +47,6 @@ config_omz() {
     # switch default shell to zsh
     chsh -s $(which zsh)
 }
-
-
-
-### Init
-# update repos first
-sudo apt-get update > /dev/null
 
 
 
@@ -83,6 +101,9 @@ rm packages.microsoft.gpg
 sudo apt-get update > /dev/null
 sudo apt-get install -y code > /dev/null
 
+# open directory links (file:///home/user/) in file browser instead of vscode
+xdg-mime default Thunar.desktop inode/directory
+
 # reconfig wireshark to run as non-root
 sudo apt-get install debconf-utils -y
 sudo debconf-set-selections <<< 'wireshark-common wireshark-common/install-setuid boolean true'
@@ -106,6 +127,15 @@ sudo wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/startwm.sh -O /et
 echo "[*] Customizing UX..."
 
 ## Panel
+
+# TODO
+# prev conf: https://github.com/DiegoBoy/ono-sendai/commit/4423433d29b445975f56d3e440e4703e40890050#
+# might be needed to fix Terminator plugin - launcher missing in panel, plugin-5 dissapears, might require adding launcher
+# xfce4-panel --add=launcher /usr/share/applications/terminator.desktop
+
+# cache newest plugin ID
+last_id=$(xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids| grep -v "Value is an\|^$" | sort -n | tail -1)
+
 # load profile
 xfce4-panel-profiles load /opt/ono-sendai/xfce4-panel.xml
 

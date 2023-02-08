@@ -142,15 +142,21 @@ ZSH_HIGHLIGHT_STYLES[arg0]=fg=green
 alias cme='crackmapexec'
 alias {pc4, proxychains}='proxychains4'
 
-
 ### util ###
-# print files
-alias bat='batcat --paging=always' # colored syntax + output paging (like an editor)
-alias cat='batcat --paging=never -p' # colored syntax, no paging
+# clipboard
+alias ctrlc='xclip -selection clipboard' # echo $var | ctrlc
+
+# open dir in browser
+alias opendir='xdg-open'
+alias ocd='xdg-open .'
 
 # list files
 alias ls='ls --color=always --group-directories-first'
 alias l='ls -halF'
+
+# print files
+alias bat='batcat --paging=always' # colored syntax + output paging (like an editor)
+alias cat='batcat --paging=never -p' # colored syntax, no paging
 
 # git
 alias ga='git add'
@@ -178,25 +184,38 @@ alias grv='git remote --verbose'
 alias gs='git status'
 
 # openvpn
-alias svpnd='sudo openvpn --daemon --config'
-alias skvpn='sudo killall -9 openvpn'
+alias ovpnd='sudo openvpn --daemon --config'
+alias ovpnk='sudo killall -9 openvpn'
 
 # extract and compress archives
 alias tar-bz2='tar -cvjf'
 alias tar-gz='tar -cvzf'
 alias tar-xz='tar -cvJf'
 alias x='extract'
-alias xr='x --remove' # remove after unpacking
+alias xr='x --remove' # rm after extract
 
+### terminator ###
+alias ttedit='code ~/.config/terminator/config'
 
 ### zsh + oh-my-zsh ###
-alias p10k-edit="code ~/.p10k.zsh"
-alias omz-edit="code ~/.oh-my-zsh/oh-my-zsh.sh"
-alias zshrc-edit='code ~/.zshrc'
-alias zshrc-load='source ~/.zshrc'
+alias pkedit='code ~/.p10k.zsh'
+alias omzedit='code ~/.oh-my-zsh/oh-my-zsh.sh'
+alias zedit='code ~/.zshrc'
+alias zload='source ~/.zshrc'
 
 # required to access the aliases, sourcing and other definitions in this zsh config as sudo
 alias _='/usr/bin/sudo'
+
+### dev mode
+if [[ -n "${ONOSENDAI_DEV_PATH}" ]]; then
+  alias ocd='cd "${ONOSENDAI_DEV_PATH}"'
+  alias odev='code "${ONOSENDAI_DEV_PATH}/install.sh"'
+  alias ttdev='code "${ONOSENDAI_DEV_PATH}/terminator.config"'
+  alias zdev='code "${ONOSENDAI_DEV_PATH}/.zshrc"'
+
+  alias ttcpdev='ask-confirm "Replace DEV [terminator.config] with HOME [terminator.config] - (new dev = home)" && cp ~/.config/terminator/config "${ONOSENDAI_DEV_PATH}/terminator.config"'
+  alias zcpdev='ask-confirm "Replace DEV [.zshrc] with HOME [.zshrc] - (new dev = home)" && cp ~/.zshrc "${ONOSENDAI_DEV_PATH}/.zshrc"'
+fi
 
 
 
@@ -205,6 +224,30 @@ alias _='/usr/bin/sudo'
 #################
 
 ### util ###
+
+# ask for user confirmation
+# $1 = message to display (default="")
+# $2 = default answer [y|n] (default=n)
+ask-confirm() {
+  local y="y"
+  local n="N"
+  local by_default=false
+  
+  [[ -z "$1" ]] || echo $1
+
+  if [[ "$2" =~ ^[Yy]$ ]]; then
+    y="Y"
+    n="n"
+    by_default=true
+  fi
+  
+  read choice\?"Continue ($y/$n)?"
+  case "$choice" in 
+    [yY] | [yY][eE][sS] ) return 0;;
+    [nN] | [nN][oO] ) return 1;;
+    * ) $by_default && return 0 || return 1;;
+  esac
+}
 
 # we can use zsh plugins as sudo this way
 sudo() {
