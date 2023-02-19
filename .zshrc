@@ -78,6 +78,8 @@ PROXYCHAINS_CMDS=(
   wget
   # cred brute force
   cewl
+  cme
+  crackmapexec
   hydra
   medusa
 )
@@ -140,7 +142,7 @@ ZSH_HIGHLIGHT_STYLES[arg0]=fg=green
 
 ### attack ###
 alias cme='crackmapexec'
-alias {pc4, proxychains}='proxychains4'
+alias {pc4,proxychains}='proxychains4'
 
 ### util ###
 # clipboard
@@ -203,25 +205,29 @@ alias tar-xz='tar -cvJf'
 alias x='extract'
 alias xr='x --remove' # rm after extract
 
-### terminator ###
+### terminator + zsh + oh-my-zsh ###
 alias ttedit='code ~/.config/terminator/config'
-
-### zsh + oh-my-zsh ###
 alias pkedit='code ~/.p10k.zsh'
 alias omzedit='code ~/.oh-my-zsh/oh-my-zsh.sh'
 alias zedit='code ~/.zshrc'
 alias zload='source ~/.zshrc'
+alias zcproot='ask-confirm "Replace ROOT [.zshrc] with HOME [.zshrc] - (new root = home)" && sudo cp ~/.zshrc root/.zshrc'
 
 # required to access the aliases, sourcing and other definitions in this zsh config as sudo
 alias _='/usr/bin/sudo'
 
 ### dev mode
 if [[ -n "${ONOSENDAI_DEV_PATH}" ]]; then
-  alias ocd='cd "${ONOSENDAI_DEV_PATH}"'
-  alias odev='code "${ONOSENDAI_DEV_PATH}/install.sh"'
+  ## ono-sendai
+  alias onocd='cd "${ONOSENDAI_DEV_PATH}"'
+  alias onodev='code "${ONOSENDAI_DEV_PATH}/install.sh"'
+
+  ## terminator + zsh + oh-my-zsh
+  # edit dev version
   alias ttdev='code "${ONOSENDAI_DEV_PATH}/terminator.config"'
   alias zdev='code "${ONOSENDAI_DEV_PATH}/.zshrc"'
 
+  # copy version in use to repo
   alias ttcpdev='ask-confirm "Replace DEV [terminator.config] with HOME [terminator.config] - (new dev = home)" && cp ~/.config/terminator/config "${ONOSENDAI_DEV_PATH}/terminator.config"'
   alias zcpdev='ask-confirm "Replace DEV [.zshrc] with HOME [.zshrc] - (new dev = home)" && cp ~/.zshrc "${ONOSENDAI_DEV_PATH}/.zshrc"'
 fi
@@ -415,13 +421,18 @@ pc4-mode() {
       unalias $cmd
     done
 
+    PROXYCHAINS_ALIAS=( )
     PROXYCHAINS_MODE=$disabled
     echo "PROXYCHAINS_MODE is now $disabled_color"
   # enable pc4-mode
   else
     for cmd in "$PROXYCHAINS_CMDS[@]"; do
-      if [[ $(command -v $cmd --no-failure-msg) ]] || [[ $(typeset -f $cmd) ]]; then
-        alias "$cmd"="proxychains -q $cmd"
+      if [[ -n "$aliases[$cmd]" ]]; then
+        # existing aliases require expansion to work properly with proxychains
+        alias $cmd="proxychains -q $aliases[$cmd]"
+        PROXYCHAINS_ALIAS+=$cmd
+      elif [[ $(command -v $cmd --no-failure-msg) ]] || [[ $(typeset -f $cmd) ]]; then
+        alias $cmd="proxychains -q $cmd"
         PROXYCHAINS_ALIAS+=$cmd
       fi
     done
