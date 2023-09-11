@@ -137,7 +137,7 @@ echo "[*] Customizing UX..."
 last_id=$(xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids| grep -v "Value is an\|^$" | sort -n | tail -1)
 
 # load profile
-xfce4-panel-profiles load /opt/ono-sendai/xfce4-panel.xml
+xfce4-panel-profiles load $SCRIPT_DIR/xfce4-panel.xml
 
 ## Wallpaper
 # copy readable image
