@@ -38,11 +38,14 @@ config_omz() {
     # install theme powerlevel10k
     git clone -q https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
 
-    # install dracula color theme for powerlevel10k
-    wget -q https://github.com/dracula/powerlevel10k/raw/main/files/.p10k.zsh -O ~/.p10k.zsh
-    
-    # update zsh config file
-    wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/.zshrc -O ~/.zshrc
+    # update configs for zsh + powerlevel10k
+    if [[ -n "${ONOSENDAI_DEV_PATH}" ]]; then
+        cp "${SCRIPT_DIR}/.p10k.zsh" ~/.p10k.zsh
+        cp "${SCRIPT_DIR}/.zshrc" ~/.zshrc
+    else
+        wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/.p10k.zsh -O ~/.p10k.zsh
+        wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/.zshrc -O ~/.zshrc
+    fi
 
     # switch default shell to zsh
     chsh -s $(which zsh)
@@ -101,6 +104,9 @@ rm packages.microsoft.gpg
 sudo apt-get update > /dev/null
 sudo apt-get install -y code > /dev/null
 
+# install xclip (terminal to clipboard)
+sudo apt-get install -y xclip
+
 # open directory links (file:///home/user/) in file browser instead of vscode
 xdg-mime default Thunar.desktop inode/directory
 
@@ -137,7 +143,14 @@ echo "[*] Customizing UX..."
 last_id=$(xfconf-query -c xfce4-panel -p /panels/panel-1/plugin-ids| grep -v "Value is an\|^$" | sort -n | tail -1)
 
 # load profile
-xfce4-panel-profiles load $SCRIPT_DIR/xfce4-panel.xml
+if [[ -n "${ONOSENDAI_DEV_PATH}" ]]; then
+    xfce4-panel-profiles load "${SCRIPT_DIR}/xfce4-panel.xml"
+else
+    TMP_FILE="$(mktemp)"
+    wget -q https://github.com/DiegoBoy/ono-sendai/raw/master/xfce4-panel.xml -O "${TMP_FILE}"
+    xfce4-panel-profiles load "${TMP_FILE}"
+    rm -f "${TMP_FILE}"
+fi
 
 ## Wallpaper
 # copy readable image
