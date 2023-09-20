@@ -207,7 +207,7 @@ alias xr='x --remove' # rm after extract
 
 ### terminator + zsh + oh-my-zsh ###
 alias ttedit='code ~/.config/terminator/config'
-alias pkedit='code ~/.p10k.zsh'
+alias p10kedit='code ~/.p10k.zsh'
 alias omzedit='code ~/.oh-my-zsh/oh-my-zsh.sh'
 alias zedit='code ~/.zshrc'
 alias zload='source ~/.zshrc'
