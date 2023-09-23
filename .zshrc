@@ -142,23 +142,32 @@ ZSH_HIGHLIGHT_STYLES[arg0]=fg=green
 
 ### attack ###
 alias cme='crackmapexec'
-alias {pc4,proxychains}='proxychains4'
+
+## lateral movement
+alias {proxychains,pc4,pxychn}='proxychains4'
+alias ligolo-setup='sudo ip tuntap add user $(whoami) mode tun ligolo && sudo ip link set ligolo up'
 
 ### util ###
+# search for aliases
+alias aliasgrep='alias | grep -i'
+
 # clipboard
 alias ctrlc='xclip -selection clipboard' # echo $var | ctrlc
 
-# open dir in browser
-alias opendir='xdg-open'
+# open dir in ux browser
 alias ocd='xdg-open .'
 
 # list files
-alias ls='ls --color=always --group-directories-first'
-alias l='ls -halF'
+alias ls='ls --color=always --group-directories-first' # print dirs first
+alias l='ls -halF' # human readable size, all files, long format, append slash to dirs (e.g., 'dir/')
+alias lcd='cdl' # change + list dir
 
 # print files
 alias bat='batcat --paging=always' # colored syntax + output paging (like an editor)
 alias cat='batcat --paging=never -p' # colored syntax, no paging
+
+# change file perms
+alias chmodx='chmod +x'
 
 # git
 alias ga='git add'
@@ -211,10 +220,16 @@ alias p10kedit='code ~/.p10k.zsh'
 alias omzedit='code ~/.oh-my-zsh/oh-my-zsh.sh'
 alias zedit='code ~/.zshrc'
 alias zload='source ~/.zshrc'
-alias zcproot='ask-confirm "Replace ROOT [.zshrc] with HOME [.zshrc] - (new root = home)" && sudo cp ~/.zshrc root/.zshrc'
+alias zcproot='ask-confirm "Replace ROOT [.zshrc] with HOME [.zshrc] - (new root = home)" && sudo cp ~/.zshrc /root/.zshrc'
 
 # required to access the aliases, sourcing and other definitions in this zsh config as sudo
 alias _='/usr/bin/sudo'
+
+### hephaestus
+if [[ -n "${HEPHAESTUS_DEV_PATH}" ]]; then
+  alias hephacd='cd "${HEPHAESTUS_DEV_PATH}"'
+  alias hephadev='code "${HEPHAESTUS_DEV_PATH}/install.sh"'
+fi
 
 ### dev mode
 if [[ -n "${ONOSENDAI_DEV_PATH}" ]]; then
@@ -272,13 +287,18 @@ ask-confirm() {
 }
 
 
+# change dir and list its contents
+# $1 = directory
+cdl() {
+  [[ -z "$1" ]] && return 1
+  cd $1 && l
+}
+
 # get the local IPv4 address range in CIDR
 # $1 = network interface (default=eth0)
 net-cidr() {
   local iface="eth0"
-  if (( $# > 0 )); then
-    iface="$1"
-  fi
+  (( $# > 0 )) && iface="$1"
 
   ip address show $iface | grep "inet " | awk '{print $2}' | head -n 1
 }
@@ -332,42 +352,6 @@ git-checkin-all() {
 
   # get status, commit all, push -u origin, and get status again
   gs && gcam "$1" && gpso && gs
-}
-
-
-### attack ###
-
-# custom settings for autorecon + autoreport
-# $1 = notion api key
-# $2 = page url / page id
-autoreconnoisseur() {
-  # set perms on results folder (otherwise it'll be root-only)
-  md results
-  chmod 2770 results
-  setfacl -d -m u::rwX,g::rwX,o::0 results
-  md results/scans
-
-  # validate args first
-  if ! autoreport --testMode -k $1 -i $2
-  then
-    return $?
-  fi
-
-  # run autoreport in background
-  autoreport --watchMode -k $1 -i $2 &
-  autoreportPID=$!
-
-  # run autorecon
-  sudo env PATH="$PATH" HOME="$HOME" autorecon -vv --single-target "${@:3}"
-
-  # color results using grc
-  for f in results/**/*nmap.txt
-  do 
-    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &> /dev/null
-  done 2> /dev/null
-
-  # send signal to stop autoreport
-  kill $autoreportPID > /dev/null
 }
 
 
@@ -440,4 +424,40 @@ pc4-mode() {
     PROXYCHAINS_MODE=$enabled
     echo "PROXYCHAINS_MODE is now $enabled_color"
   fi
+}
+
+
+### attack ###
+
+# custom settings for autorecon + autoreport
+# $1 = notion api key
+# $2 = page url / page id
+autoreconnoisseur() {
+  # set perms on results folder (otherwise it'll be root-only)
+  md results
+  chmod 2770 results
+  setfacl -d -m u::rwX,g::rwX,o::0 results
+  md results/scans
+
+  # validate args first
+  if ! autoreport --testMode -k $1 -i $2
+  then
+    return $?
+  fi
+
+  # run autoreport in background
+  autoreport --watchMode -k $1 -i $2 &
+  autoreportPID=$!
+
+  # run autorecon
+  sudo env PATH="$PATH" HOME="$HOME" autorecon -vv --single-target "${@:3}"
+
+  # color results using grc
+  for f in results/**/*nmap.txt
+  do 
+    grcat /usr/share/grc/conf.nmap < "$f" | sudo tee "$f".ansi &> /dev/null
+  done 2> /dev/null
+
+  # send signal to stop autoreport
+  kill $autoreportPID > /dev/null
 }
