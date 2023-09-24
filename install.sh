@@ -95,6 +95,9 @@ sudo apt-get install -y bat > /dev/null
 sudo apt-get install -y grc > /dev/null
 sudo curl -s -fsSL https://raw.githubusercontent.com/garabik/grc/master/grc.zsh -o /etc/grc.zsh
 
+# install fd (find replacement)
+sudo apt-get install -y fd-find
+
 # install vs code
 sudo apt-get install -y apt-transport-https > /dev/null
 curl -s -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg

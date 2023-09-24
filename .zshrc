@@ -88,6 +88,11 @@ PROXYCHAINS_CMDS=(
 ### zsh + oh-my-zsh ###
 COMPLETION_WAITING_DOTS="true"
 
+# fzf - fuzzy finder
+FZF_DEFAULT_OPTS="--preview='batcat --color=always --style=full {}' --bind='ctrl-/:change-preview-window(hidden|)'"
+FZF_CTRL_R_OPTS="--preview=''"
+FZF_ALT_C_OPTS="--preview=''"
+
 # zsh-syntax-highlighting - custom syntax highlighting color profile
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(brackets main)
 ZSH_HIGHLIGHT_STYLES[default]=none
@@ -163,8 +168,12 @@ alias l='ls -halF' # human readable size, all files, long format, append slash t
 alias lcd='cdl' # change + list dir
 
 # print files
-alias bat='batcat --paging=always' # colored syntax + output paging (like an editor)
-alias cat='batcat --paging=never -p' # colored syntax, no paging
+alias bat='batcat --color=always --paging=always --style=auto' # colored syntax, enable paging, include file_name + line_num + git changes 
+alias cat='batcat --color=always --paging=never --style=plain' # colored syntax, no paging, display file contents only
+alias less='batcat --color=always --paging=always --style=plain' # colored syntax, enable paging, display file contents only
+
+# find files
+alias fd='fdfind'
 
 # change file perms
 alias chmodx='chmod +x'
@@ -255,7 +264,7 @@ fi
 #   functions   #
 #################
 
-### util ###
+### zsh + oh-my-zsh ###
 
 # we can use zsh plugins as sudo this way
 sudo() {
@@ -263,6 +272,17 @@ sudo() {
     _ zsh -ic "$full_cmd"
 }
 
+## fzf - replace find with fd
+_fzf_compgen_path() {
+  echo "$1"
+  command fdfind --type f --hidden --follow --exclude ".git" . "$1"
+}
+
+_fzf_compgen_dir() {
+  command fdfind --type d --hidden --follow --exclude ".git" . "$1"
+}
+
+### util ###
 
 # ask for user confirmation
 # $1 = message to display (default="")
