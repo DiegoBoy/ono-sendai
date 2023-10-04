@@ -168,8 +168,8 @@ alias l='ls -halF' # human readable size, all files, long format, append slash t
 alias lcd='cdl' # change + list dir
 
 # print files
-alias bat='batcat --color=always --paging=always --style=auto' # colored syntax, enable paging, include file_name + line_num + git changes 
-alias cat='batcat --color=always --paging=never --style=plain' # colored syntax, no paging, display file contents only
+alias bat='batcat --color=always --paging=always --style=auto' # always colored syntax, enable paging, include file_name + line_num + git changes 
+alias cat='batcat --color=auto --paging=never --style=plain' # colored syntax is context-dependent (e.g., off for piped output), no paging, display file contents only
 alias less='batcat --color=always --paging=always --style=plain' # colored syntax, enable paging, display file contents only
 
 # find files
