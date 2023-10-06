@@ -211,12 +211,16 @@ alias ipcidr='net-cidr'
 alias ipmask='net-mask'
 alias iprange='net-range'
 
-# openvpn
+# vpn
 alias vpnip='net-ip tun0'
 alias vpncidr='net-cidr tun0'
 alias vpnmask='net-mask tun0'
 alias vpnrange='net-range tun0'
 alias vpnkill='sudo killall -9 openvpn'
+
+# hosts
+alias hosts='cat /etc/hosts'
+alias hostsedit='sudo nano /etc/hosts'
 
 # extract and compress archives
 alias tar-bz2='tar -cvjf'
@@ -285,8 +289,8 @@ _fzf_compgen_dir() {
 ### util ###
 
 # ask for user confirmation
-# $1 = message to display (default="")
-# $2 = default answer [y|n] (default=n)
+# $1 = message to display (default => "")
+# $2 = default answer (default => n)
 ask-confirm() {
   local y="y"
   local n="N"
@@ -310,14 +314,16 @@ ask-confirm() {
 
 
 # change dir and list its contents
-# $1 = directory
+# $1 = directory (default => ~)
 cdl() {
-  [[ -z "$1" ]] && return 1
-  cd $1 && l
+  (( $# > 1 )) && (echo "Usage: cd [directory]"; return 1)
+
+  local directory=${1:=~}
+  cd "${directory}" && l
 }
 
 # get the local IPv4 address range in CIDR
-# $1 = network interface (default=eth0)
+# $1 = network interface (default => eth0)
 net-cidr() {
   local iface="eth0"
   (( $# > 0 )) && iface="$1"
@@ -327,28 +333,28 @@ net-cidr() {
 
 
 # get the local IPv4 address
-# $1 = network interface (default=eth0)
+# $1 = network interface (default => eth0)
 net-ip() {
   net-cidr $1 | cut -d '/' -f 1
 }
 
 
 # get the local IPv4 subnet mask
-# $1 = network interface (default=eth0)
+# $1 = network interface (default => eth0)
 net-mask() {
   netmask -s $(net-cidr $1) | cut -d '/' -f2 | awk '{$1=$1};1'
 }
 
 
 # get the local IPv4 subnet mask
-# $1 = network interface (default=eth0)
+# $1 = network interface (default => eth0)
 net-range() {
   netmask -r $(net-cidr $1) | awk '{$1=$1};1'
 }
 
 
 # convenient wrapper for net-ip
-# $1 = network interface (default=eth0)
+# $1 = network interface (default => eth0)
 ip() {
   if (( ! $# )); then
     net-ip
@@ -364,9 +370,35 @@ vpnd() {
   sudo openvpn --daemon --config "$1" && sleep 1
 }
 
+
+# add an entry to the /etc/hosts file
+# $1 = IP address
+# $2 = hostname
+hostsadd() {
+  if [[ ${#} -ne 2 ]]; then
+    echo "Usage: hosts-add <ip_address> <hostname>"
+    return 1
+  fi
+
+  grep -qx "$1\s+$2" /etc/hosts || sudo sed -i "1s/^/$1\\\t$2\\\n/" /etc/hosts
+}
+
+
+# delete entries from the /etc/hosts file
+# $1 = IP address
+hostsdel() {
+  if (( ! $# )); then
+    echo "Usage: hosts-del <ip_address>" >&2
+    return 1
+  fi
+
+  sudo sed -i "/^$1\\\s\\\+.\\\+/d" /etc/hosts
+}
+
+
 # pushes a commit that includes all changes
 # $1 = message for commit
-git-checkin-all() {
+git-push-all() {
   if (( ! $# )); then
     echo "A commit message is required."
     return 1
@@ -376,20 +408,24 @@ git-checkin-all() {
   gs && gcam "$1" && gpso && gs
 }
 
-
-# set alias for commands compatible with proxychains
-# $1 = enable or disable (default=status)
+# enables/disables alias wrappers for transparent execution of convenient commands over proxychains
+#   e.g. nmap => proxychains -q nmap
+# [no args] = get current status
+# $1 = enable or disable
+# $PROXYCHAINS_CMDS[@] = list of commands wrapped with aliases
 pc4-mode() {
   local help_opts=( "-h" "--help" )
-  if (( ! $help_opts[(ie)$1] )); then
-    echo "[*] Manage aliases to simplify network commands that work with proxychains"
+  if (( $# > 1 )) || (( ${#${@:*help_opts}} )); then
+    echo "[*] Enable or disable aliases for transparent execution over proxychains."
     echo ""
     echo "Usage:"
-    echo "        ${funcstack[1]}             print the ON/OFF status"
-    echo "        ${funcstack[1]} [ON|OFF]    enable or disable the aliases"
+    echo "        ${funcstack[1]}                  print the current status"
+    echo "        ${funcstack[1]} <ON|OFF>         enable or disable aliases"
     echo ""
     echo "Options:"
-    echo "        -h, --help                  print this help message"
+    echo "        -h, --help                print this help message"
+    echo ""
+    echo "Update \$PROXYCHAINS_CMDS[@] to add or remove aliased commands."
     return
   fi
 
@@ -401,7 +437,7 @@ pc4-mode() {
   local mode="${PROXYCHAINS_MODE:u}"
   local modeEnabled="$(( $valid_enabled[(Ie)$mode] ))"
 
-  # if no args, print status
+  # if no args, print current status
   if (( ! $# )); then
     echo -n "PROXYCHAINS_MODE="
     (($modeEnabled)) && echo $enabled_color || echo $disabled_color
